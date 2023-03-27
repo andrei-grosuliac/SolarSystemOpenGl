@@ -1,0 +1,10 @@
+^C:\USERS\AGROS\DOCUMENTS\CONCORDIA\WINTER2023\COMP371\SOLARSYSTEM\DEPENDENCIES\GLFW-3.3.8\BUILD\CMAKEFILES\A41E95E4E46AF8CB292E74BEAD8CD519\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/agros/Documents/Concordia/Winter2023/comp371/SolarSystem/Dependencies/glfw-3.3.8 -BC:/Users/agros/Documents/Concordia/Winter2023/comp371/SolarSystem/Dependencies/glfw-3.3.8/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/agros/Documents/Concordia/Winter2023/comp371/SolarSystem/Dependencies/glfw-3.3.8/build/GLFW.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
