@@ -6,3 +6,4 @@ SolarSystem/x64/*
 *.vcxproj
 *.filters
 *.dll
+*.user
