@@ -1,7 +1,0 @@
-﻿  Building Custom Rule C:/Users/agros/Documents/Concordia/Winter2023/comp371/SolarSystem/Dependencies/glfw-3.3.8/examples/CMakeLists.txt
-  particles.c
-  tinycthread.c
-  getopt.c
-  glad_gl.c
-  Generating Code...
-  particles.vcxproj -> C:\Users\agros\Documents\Concordia\Winter2023\comp371\SolarSystem\Dependencies\glfw-3.3.8\build\examples\Debug\particles.exe

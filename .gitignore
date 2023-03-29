@@ -1,0 +1,8 @@
+Dependencies/*
+.vs/*
+x64/*
+SolarSystem/x64/*
+*.htm
+*.vcxproj
+*.filters
+*.dll
