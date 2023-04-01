@@ -30,12 +30,12 @@ class Skybox {
         }
         vector<std::string> faces
         {
-            "skybox/Spacebox_right.png",
-            "skybox/Spacebox_left.png",
-            "skybox/Spacebox_top.png",
-            "skybox/Spacebox_bottom.png",
-            "skybox/Spacebox_front.png",
-            "skybox/Spacebox_back.png"
+            "../resources/skybox/Spacebox_right.png",
+            "../resources/skybox/Spacebox_left.png",
+            "../resources/skybox/Spacebox_top.png",
+            "../resources/skybox/Spacebox_bottom.png",
+            "../resources/skybox/Spacebox_front.png",
+            "../resources/skybox/Spacebox_back.png"
         };
         float skyboxVertices[108] = {
             // positions

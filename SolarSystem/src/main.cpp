@@ -14,7 +14,6 @@
 #include "Planet.h"
 #include "Model.h"
 #include <stdio.h>
-#include "SOIL2.h"
 #include "Texture.h"
 #include "Skybox.h"
 using namespace std;
@@ -80,23 +79,23 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     //Load Shaders
-    Shader modelShader("resources/shaders/modelLoading.vs", "resources/shaders/modelLoading.frag");
-    Shader lampShader("resources/shaders/lamp.vs", "resources/shaders/lamp.frag");
-    Shader lineShader("resources/shaders/line.vs", "resources/shaders/line.frag");
-    Shader skyboxShader("resources/shaders/skyBox.vs", "resources/shaders/skyBox.frag");
+    Shader modelShader("../resources/shaders/modelLoading.vs", "../resources/shaders/modelLoading.frag");
+    Shader lampShader("../resources/shaders/lamp.vs", "../resources/shaders/lamp.frag");
+    Shader lineShader("../resources/shaders/line.vs", "../resources/shaders/line.frag");
+    Shader skyboxShader("../resources/shaders/skybox.vs", "../resources/shaders/skybox.frag");
 
     // Load models    
-    Model earthModel("resources/models/earth/Earth.obj");
-    Model space("resources/models/space/space.obj");
-    Model sunModel1("resources/models/sun/sun.obj");
-    Model sunModel2("resources/models/sun2/sun.obj");
-    Model mercuryModel("resources/models/mercury/mercury.obj");
-    Model venusModel("resources/models/venus/venus.obj");
-    Model marsModel("resources/models/mars/mars.obj");
-    Model jupiterModel("resources/models/jupiter/jupiter.obj");
-    Model saturnModel("resources/models/saturn/13906_Saturn_v1_l3.obj");
-    Model uranusModel("resources/models/uranus/13907_Uranus_v2_l3.obj");
-    Model neptuneModel("resources/models/neptune/13908_Neptune_v2_l3.obj");
+    Model earthModel("../resources/models/earth/Earth.obj");
+    Model space("../resources/models/space/space.obj");
+    Model sunModel1("../resources/models/sun/sun.obj");
+    Model sunModel2("../resources/models/sun2/sun.obj");
+    Model mercuryModel("../resources/models/mercury/mercury.obj");
+    Model venusModel("../resources/models/venus/venus.obj");
+    Model marsModel("../resources/models/mars/mars.obj");
+    Model jupiterModel("../resources/models/jupiter/jupiter.obj");
+    Model saturnModel("../resources/models/saturn/13906_Saturn_v1_l3.obj");
+    Model uranusModel("../resources/models/uranus/13907_Uranus_v2_l3.obj");
+    Model neptuneModel("../resources/models/neptune/13908_Neptune_V2_l3.obj");
 
     // Planets    
     Planet planetHelper(lightPositions);

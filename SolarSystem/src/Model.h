@@ -14,7 +14,7 @@
 #include <assimp/postprocess.h>
 #include "SOIL2.h"
 
-#include "mesh.h"
+#include "Mesh.h"
 
 using namespace std;
 
