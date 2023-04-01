@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 // GL Includes
 
@@ -11,12 +12,14 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Default camera values
-const GLfloat YAW = -90.0f;
-const GLfloat PITCH = 0.0f;
+const GLfloat YAW = 0.0f;
+const GLfloat PITCH = -30.0f;
 GLfloat SPEED = 6.0f;
 const GLfloat SENSITIVTY = 0.25f;
 const GLfloat ZOOM = 45.0f;
@@ -61,6 +64,12 @@ public:
         else if (direction == RIGHT) {
             this->position += this->right * velocity;
         }
+        else if (direction == UP) {
+            this->position += this->up * velocity;
+        }
+        else if (direction == DOWN) {
+            this->position -= this->up * velocity;
+        }
     }
 
     void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true) {
@@ -86,12 +95,18 @@ public:
         this->position = position;
     }
 
+    void SetOrientation(GLfloat yaw, GLfloat pitch) {
+        this->yaw = yaw;
+        this->pitch = pitch;
+        updateCameraVectors();
+    }
+
     void DecreaseSpeed() {
-        this->movementSpeed = this->movementSpeed - 0.01f;
+        this->movementSpeed = this->movementSpeed - 0.1f;
     }
 
     void IncreaseSpeed() {
-        this->movementSpeed = this->movementSpeed + 0.01f;
+        this->movementSpeed = this->movementSpeed + 0.1f;
     }
 
     GLfloat GetZoom() {

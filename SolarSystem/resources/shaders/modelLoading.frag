@@ -1,6 +1,8 @@
 
 #version 330 core
 
+#define NUMBER_OF_POINT_LIGHTS 2
+
 in vec2 TexCoords;
 
 struct Light {
@@ -23,10 +25,21 @@ out vec4 color;
 uniform vec3 viewPos;
 uniform sampler2D texture_diffuse;
 uniform sampler2D texture_specular;
-uniform Light light;
+uniform Light lights[NUMBER_OF_POINT_LIGHTS];
+vec3 CalcPointLight( Light light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main() {
-    vec3 ambient = light.ambient * vec3(texture(texture_diffuse, TexCoords));
+	vec3 norm = normalize(Normal);
+	vec3 viewDir = normalize(viewPos - FragPos);
+	vec3 result;
+    for(int i =0; i<NUMBER_OF_POINT_LIGHTS; i++){
+		result += CalcPointLight(lights[i], norm, FragPos, viewDir);
+	}
+	color = vec4(result, 1.0);
+}
+
+vec3 CalcPointLight( Light light, vec3 normal, vec3 fragPos, vec3 viewDir){
+	vec3 ambient = light.ambient * vec3(texture(texture_diffuse, TexCoords));
     
     // Diffuse
     vec3 norm = normalize(Normal);
@@ -34,8 +47,7 @@ void main() {
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * vec3(texture(texture_diffuse, TexCoords));
     
-    // Specular
-    vec3 viewDir = normalize(viewPos - FragPos);
+    // Specular    
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0f);
     vec3 specular = light.specular * spec * vec3(texture( texture_specular, TexCoords));
@@ -47,8 +59,7 @@ void main() {
     diffuse  *= attenuation;
     specular *= attenuation;
     
-    color = vec4(ambient + diffuse + specular, 1.0f);
+	vec3 result;
+    result = vec3(ambient + diffuse + specular);
+	return result;
 }
-
-
-//    color = vec4( texture( texture_diffuse, TexCoords ));

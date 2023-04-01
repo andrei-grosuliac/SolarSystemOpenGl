@@ -11,44 +11,255 @@
 #include <assimp/postprocess.h>
 #include "Camera.h"
 #include "Shader.h"
+#include "Planet.h"
 #include "Model.h"
 #include <stdio.h>
-#include "SOIL.h"
-
+#include "SOIL2.h"
+#include "Texture.h"
+#include "Skybox.h"
 using namespace std;
 
-const GLint WIDTH = 800, HEIGHT = 600;
-const double PI = 3.141592653589793238463;
-int SCREEN_WIDTH, SCREEN_HEIGHT;
+int SCREEN_WIDTH = 1000;
+int SCREEN_HEIGHT = 750;
+
+// Light attributes
+glm::vec3 lightPositions[] =
+{
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(0.0f, 0.0f, -20.0f)
+};
 
 // Function prototypes
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
-void DoMovement();
+void DoMovement(Planet& planetHelper);
 
 // Camera
-Camera camera(glm::vec3(40.0f, 0.0f, 30.0f));
+Camera camera(glm::vec3(-20.0f, 10.0f, 10.0f));
 bool keys[1024];
-GLfloat lastX = 400, lastY = 300;
+GLfloat lastX = (float)SCREEN_WIDTH / 2.0, lastY = (float)SCREEN_HEIGHT / 2.0;
 bool firstMouse = true;
 string cameraType = "";
 
-// Light attributes
-glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-
+// Time
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
-GLfloat speed = 1.0f;
+int main()
+{
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-void DoMovement() {
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Solar System", nullptr, nullptr);
 
-    if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP]) {
+    if (nullptr == window)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+
+        return EXIT_FAILURE;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCursorPosCallback(window, MouseCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glewExperimental = GL_TRUE;
+    if (GLEW_OK != glewInit())
+    {
+        std::cout << "Failed to initialize GLEW" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    glEnable(GL_DEPTH_TEST);
+
+    //Load Shaders
+    Shader modelShader("resources/shaders/modelLoading.vs", "resources/shaders/modelLoading.frag");
+    Shader lampShader("resources/shaders/lamp.vs", "resources/shaders/lamp.frag");
+    Shader lineShader("resources/shaders/line.vs", "resources/shaders/line.frag");
+    Shader skyboxShader("resources/shaders/skyBox.vs", "resources/shaders/skyBox.frag");
+
+    // Load models    
+    Model earthModel("resources/models/earth/Earth.obj");
+    Model space("resources/models/space/space.obj");
+    Model sunModel1("resources/models/sun/sun.obj");
+    Model sunModel2("resources/models/sun2/sun.obj");
+    Model mercuryModel("resources/models/mercury/mercury.obj");
+    Model venusModel("resources/models/venus/venus.obj");
+    Model marsModel("resources/models/mars/mars.obj");
+    Model jupiterModel("resources/models/jupiter/jupiter.obj");
+    Model saturnModel("resources/models/saturn/13906_Saturn_v1_l3.obj");
+    Model uranusModel("resources/models/uranus/13907_Uranus_v2_l3.obj");
+    Model neptuneModel("resources/models/neptune/13908_Neptune_v2_l3.obj");
+
+    // Planets    
+    Planet planetHelper(lightPositions);
+    glm::vec3 centerOfMass = planetHelper.centerOfMass;
+
+    //Skybox
+    Skybox skybox;
+    unsigned int cubemapTexture = TextureLoading::LoadCubemap(skybox.faces);
+
+    // Perspective Projection
+    glm::mat4 projection = glm::perspective(camera.GetZoom(), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+
+    GLuint i = 0;
+
+    // Main loop
+    while (!glfwWindowShouldClose(window))
+    {
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        if (planetHelper.move) {
+            i++;
+        }       
+        glfwPollEvents();
+        DoMovement(planetHelper);
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glm::mat4 view(1);
+        view = camera.GetViewMatrix();
+        std::tuple<glm::mat4, GLfloat, GLfloat> modelAndCoordinates;        
+        glm::mat4 model(1);        
+
+        //PLANETS
+
+        GLfloat angle, radius, x, y;
+        modelShader.Use();
+        GLint viewPosLoc = glGetUniformLocation(modelShader.Program, "viewPos");
+        glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);        
+
+        // Set lights properties
+
+        //PointLight 1
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[0].position"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[0].ambient"), 0.2f, 0.2f, 0.2f);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[0].diffuse"), 4.5f, 4.5f, 4.5f);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[0].specular"), 0.0f, 0.0f, 0.0f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[0].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[0].linear"), 0.02f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[0].quadratic"), 0.006f);
+
+        //PointLight 2
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[1].position"), lightPositions[1].x, lightPositions[1].y, lightPositions[1].z);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[1].ambient"), 0.2f, 0.2f, 0.2f);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[1].diffuse"), 2.0f, 0.0f, 0.0f);
+        glUniform3f(glGetUniformLocation(modelShader.Program, "lights[1].specular"), 0.0f, 0.0f, 0.0f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[1].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[1].linear"), 0.02f);
+        glUniform1f(glGetUniformLocation(modelShader.Program, "lights[1].quadratic"), 0.006f);
+
+        glUniformMatrix4fv(glGetUniformLocation(modelShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(modelShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+        // Mercury
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 1.0f, 250.0f, 0.3f, 40.0f);
+        mercuryModel.Draw(modelShader);
+
+        // Venus
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.9f, 270.0f, 0.5f, 40.0f);
+        venusModel.Draw(modelShader);
+
+        // Earth
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.8f, 290.0f, 0.5f, 40.0f);
+        earthModel.Draw(modelShader);
+
+        if (cameraType == "Earth") {
+            glm::vec3 cameraPosition = (glm::vec3(get<1>(modelAndCoordinates), 0.2f, get<2>(modelAndCoordinates)) + centerOfMass);
+            camera.SetPosition(cameraPosition);
+
+            // Calculate the direction vector pointing towards the center of mass
+            glm::vec3 direction = glm::normalize(centerOfMass - cameraPosition);
+            float newYaw = glm::degrees(atan2(direction.z, direction.x));
+            float newPitch = glm::degrees(asin(direction.y));
+            camera.SetOrientation(newYaw, newPitch);
+        }
+
+        // Mars
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.7f, 300.0f, 0.3f, 40.0f);
+        marsModel.Draw(modelShader);
+
+        // Jupiter
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.6f, 350.0f, 4.0f, 30.0f);
+        jupiterModel.Draw(modelShader);
+
+        // Saturn  
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.5f, 410.0f, 0.032f, 20.0f, glm::vec3(0.0f, 0.5f, -0.35f));
+        model = get<0>(modelAndCoordinates);
+        model = glm::rotate(model, 61.0f, glm::vec3(0.0f, 0.1f, 0.0f));
+        model = glm::rotate(model, 90.0f, glm::vec3(0.1f, 0.0f, 0.0f));
+        glUniformMatrix4fv(glGetUniformLocation(modelShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        saturnModel.Draw(modelShader);
+
+        // Uranus
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.4f, 450.0f, 0.03f, 10.0f);
+        uranusModel.Draw(modelShader);
+
+        // Neptune
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.3f, 500.0f, 0.03f, 10.0f);
+        neptuneModel.Draw(modelShader);
+
+        //Orbit Lines
+        lineShader.Use();
+        glUniformMatrix4fv(glGetUniformLocation(lineShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(lineShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        planetHelper.DrawOrbitLines(lineShader);
+
+        // SUNS
+        lampShader.Use();
+        glUniformMatrix4fv(glGetUniformLocation(lampShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(lampShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+        //Sun 1        
+        planetHelper.transformSunModel(lampShader, i, 0.01f, 0.0f, 0, 20.0f, 20.0f);
+        sunModel1.Draw(lampShader);
+
+        //Sun 2        
+        planetHelper.transformSunModel(lampShader, i, 0.01f, glm::pi<float>(), 1, 7.0f, 30.0f);
+        sunModel2.Draw(lampShader);
+
+        //over the sun
+        if (cameraType == "Up") {
+            camera.SetPosition(glm::vec3(-1.5f, 55.0f, -3.0f));
+            camera.SetOrientation(0.0f, -88.0f);
+        }    
+
+        // Draw skybox
+        view = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation component
+        skybox.DrawSkybox(skyboxShader, cubemapTexture, view, projection);
+        
+        glfwSwapBuffers(window);
+        
+    }
+    glfwTerminate();
+    return 0;
+};
+
+void DoMovement(Planet &planetHelper) {
+
+    if (keys[GLFW_KEY_W]) {
         camera.ProcessKeyboard(FORWARD, deltaTime);
     }
 
-    if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN]) {
+    if (keys[GLFW_KEY_UP]) {
+        camera.ProcessKeyboard(UP, deltaTime);
+    }
+
+    if (keys[GLFW_KEY_S]) {
         camera.ProcessKeyboard(BACKWARD, deltaTime);
+    }
+
+    if (keys[GLFW_KEY_DOWN]) {
+        camera.ProcessKeyboard(DOWN, deltaTime);
     }
 
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT]) {
@@ -66,48 +277,35 @@ void DoMovement() {
     if (keys[GLFW_KEY_EQUAL]) {
         camera.IncreaseSpeed();
     }
-
-    if (keys[GLFW_KEY_1]) {
-        cameraType = "Mercury";
+    else if (keys[GLFW_KEY_1]) {
+        cameraType = "Up";
     }
     else if (keys[GLFW_KEY_2]) {
-        cameraType = "Venus";
+        cameraType = "";
     }
     else if (keys[GLFW_KEY_3]) {
         cameraType = "Earth";
     }
-    else if (keys[GLFW_KEY_4]) {
-        cameraType = "Mars";
-    }
-    else if (keys[GLFW_KEY_5]) {
-        cameraType = "Jupiter";
-    }
-    else if (keys[GLFW_KEY_6]) {
-        cameraType = "Saturn";
-    }
-    else if (keys[GLFW_KEY_7]) {
-        cameraType = "Uranus";
-    }
-    else if (keys[GLFW_KEY_8]) {
-        cameraType = "Neptune";
-    }
-    else if (keys[GLFW_KEY_0]) {
-        cameraType = "";
-    }
-    else if (keys[GLFW_KEY_U]) {
-        cameraType = "Up";
-    }
-
-    if (keys[GLFW_KEY_M]) {
-        speed = speed + 0.1f;
-        std::cout << "SPEED : " << speed << std::endl;
+    else if (keys[GLFW_KEY_M]) {
+        planetHelper.speed += 0.01f;
+        std::cout << "SPEED : " << planetHelper.speed << std::endl;
     }
     else if (keys[GLFW_KEY_N]) {
-        speed = speed - 0.1f;
-        std::cout << "SPEED : " << speed << std::endl;
+        planetHelper.speed -= 0.01f;
+        if (planetHelper.speed <= 0.0001f) {
+            planetHelper.speed = 0.001f;
+        }
+        std::cout << "SPEED : " << planetHelper.speed << std::endl;
+    }
+    else if (keys[GLFW_KEY_P]) {
+        planetHelper.move = !planetHelper.move;
+        std::cout << "Pause/Unpaused movement" << std::endl;
+    }
+    else if (keys[GLFW_KEY_O]) {
+        planetHelper.orbitLines = !planetHelper.orbitLines;
+        std::cout << "Show/UnShow OrbitLines" << std::endl;
     }
 }
-
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action) {
@@ -139,320 +337,3 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos) {
 
     camera.ProcessMouseMovement(xOffset, yOffset);
 }
-
-
-int main()
-{
-    bool move = true;
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Solar System", nullptr, nullptr);
-
-    if (nullptr == window)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-
-        return EXIT_FAILURE;
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-    glfwSetKeyCallback(window, KeyCallback);
-    glfwSetCursorPosCallback(window, MouseCallback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glewExperimental = GL_TRUE;
-    if (GLEW_OK != glewInit())
-    {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    glEnable(GL_DEPTH_TEST);
-
-    Shader shader("resources/shaders/modelLoading.vs", "resources/shaders/modelLoading.frag");
-    Shader directionalShader("resources/shaders/directional.vs", "resources/shaders/directional.frag");
-    Shader lampShader("resources/shaders/lamp.vs", "resources/shaders/lamp.frag");
-
-    // Load models
-    Model earthModel("resources/models/earth/Earth.obj");
-    Model space("resources/models/space/space.obj");
-    Model sunModel("resources/models/sun/sun.obj");
-    Model mercuryModel("resources/models/mercury/mercury.obj");
-    Model venusModel("resources/models/venus/venus.obj");
-    Model marsModel("resources/models/mars/mars.obj");
-    Model jupiterModel("resources/models/jupiter/jupiter.obj");
-    Model saturnModel("resources/models/saturn/13906_Saturn_v1_l3.obj");
-    Model uranusModel("resources/models/uranus/13907_Uranus_v2_l3.obj");
-    Model neptuneModel("resources/models/neptune/13908_Neptune_v2_l3.obj");
-
-    //    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-    glm::mat4 projection(1);
-    projection = glm::perspective(camera.GetZoom(), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-
-    GLfloat scale = 0.1f;
-    GLuint i = 0;
-
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
-        GLfloat currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        i++;
-        glfwPollEvents();
-        DoMovement();
-        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-        glm::mat4 view(1);
-        view = camera.GetViewMatrix();
-
-        directionalShader.Use();
-
-        // Set lights properties
-        glUniform3f(glGetUniformLocation(directionalShader.Program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(directionalShader.Program, "light.ambient"), 0.2f, 0.2f, 0.2f);
-        glUniform3f(glGetUniformLocation(directionalShader.Program, "light.diffuse"), 1.5f, 1.5f, 1.5f);
-        glUniform3f(glGetUniformLocation(directionalShader.Program, "light.specular"), 0.0f, 0.0f, 0.0f);
-
-        glUniformMatrix4fv(glGetUniformLocation(directionalShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(directionalShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-        // Model
-
-        // SPACE
-        glm::mat4 model(1);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(20.0f));
-        glUniformMatrix4fv(glGetUniformLocation(directionalShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        space.Draw(directionalShader);
-
-        GLfloat angle, radius, x, y;
-
-        shader.Use();
-        GLint viewPosLoc = glGetUniformLocation(shader.Program, "viewPos");
-        glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-
-        // Set lights properties
-        glUniform3f(glGetUniformLocation(shader.Program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(shader.Program, "light.ambient"), 0.2f, 0.2f, 0.2f);
-        glUniform3f(glGetUniformLocation(shader.Program, "light.diffuse"), 1.5f, 1.5f, 1.5f);
-        glUniform3f(glGetUniformLocation(shader.Program, "light.specular"), 0.0f, 0.0f, 0.0f);
-        glUniform1f(glGetUniformLocation(shader.Program, "light.constant"), 1.0f);
-        glUniform1f(glGetUniformLocation(shader.Program, "light.linear"), 0.02f);
-        glUniform1f(glGetUniformLocation(shader.Program, "light.quadratic"), 0.006f);
-
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-        // MERCURY
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.008f * i * speed;
-            radius = 70.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(70.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Mercury") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 0.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.3f * scale));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        mercuryModel.Draw(shader);
-
-        // VENUS
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.007f * i * speed;
-            radius = 80.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(80.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Venus") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 0.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.5f * scale));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        venusModel.Draw(shader);
-
-        // EARTH
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.006f * i * speed;
-            radius = 90.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(90.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Earth") {
-            camera.SetPosition(glm::vec3(x + 0.5f, -0.5f, y + 0.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.5f * scale));
-        angle = 0.001f * i;
-        model = glm::rotate(model, angle, glm::vec3(0.0f, 0.1f, 0.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        earthModel.Draw(shader);
-
-        // MARS
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.005f * i * speed;
-            radius = 100.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(100.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Mars") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 0.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.3f * scale));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        marsModel.Draw(shader);
-
-        // JUPITER
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.0045f * i * speed;
-            radius = 120.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(120.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Jupiter") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 2.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(4.0f * scale));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        jupiterModel.Draw(shader);
-
-        // SATURN
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.0040f * i * speed;
-            radius = 160.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(160.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Saturn") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 2.5f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.032f * scale));
-        angle = 0.0001f * i;
-        model = glm::rotate(model, 90.0f + angle, glm::vec3(0.0f, 0.1f, 0.5f));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        saturnModel.Draw(shader);
-
-        // Uranus
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.0035f * i * speed;
-            radius = 190.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(190.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Uranus") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 2.0f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.03f * scale));
-        angle = 0.00001f * i;
-        model = glm::rotate(model, 160.0f + angle, glm::vec3(0.0f, 0.1f, 0.5f));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        uranusModel.Draw(shader);
-
-        // NEPTUNE
-        model = glm::mat4(1);
-        if (move) {
-            angle = 0.003f * i * speed;
-            radius = 220.0f * scale;
-            x = radius * sin(PI * 2 * angle / 360);
-            y = radius * cos(PI * 2 * angle / 360);
-            model = glm::translate(model, glm::vec3(x, 0.0f, y));
-        }
-        else {
-            model = glm::translate(model, glm::vec3(220.0f * scale, 0.0f, 0.0f));
-        }
-
-        if (cameraType == "Neptune") {
-            camera.SetPosition(glm::vec3(x + 0.5f, 0.0f, y + 2.0f));
-        }
-
-        model = glm::scale(model, glm::vec3(0.03f * scale));
-        angle = 0.00001f * i;
-        model = glm::rotate(model, 130.0f + angle, glm::vec3(0.0f, 0.1f, 0.5f));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        neptuneModel.Draw(shader);
-
-        // SUN
-        lampShader.Use();
-        GLint modelLoc = glGetUniformLocation(lampShader.Program, "model");
-        GLint viewLoc = glGetUniformLocation(lampShader.Program, "view");
-        GLint projLoc = glGetUniformLocation(lampShader.Program, "projection");
-
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        model = glm::mat4(1);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(20.0f * scale));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        sunModel.Draw(lampShader);
-
-        if (cameraType == "Up") {
-            camera.SetPosition(glm::vec3(-1.438195, 38.160343, 1.159209));
-        }
-
-        glfwSwapBuffers(window);
-    }
-
-    glfwTerminate();
-    return 0;
-};

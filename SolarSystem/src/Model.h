@@ -12,7 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "SOIL.h"
+#include "SOIL2.h"
 
 #include "mesh.h"
 
@@ -148,8 +148,9 @@ GLint TextureFromFile(const char* path, string directory) {
     glGenTextures(1, &textureID);
 
     int width, height;
+    int* zero = new int(0);
 
-    unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+    unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, zero, SOIL_LOAD_RGB);
 
     glBindTexture(GL_TEXTURE_2D, textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
@@ -162,4 +163,4 @@ GLint TextureFromFile(const char* path, string directory) {
     SOIL_free_image_data(image);
 
     return textureID;
-}
+};
