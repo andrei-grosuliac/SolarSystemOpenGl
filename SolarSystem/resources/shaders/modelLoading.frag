@@ -31,7 +31,7 @@ vec3 CalcPointLight( Light light, vec3 normal, vec3 fragPos, vec3 viewDir);
 void main() {
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 result;
+	vec3 result = vec3(0.0,0.0,0.0);
     for(int i =0; i<NUMBER_OF_POINT_LIGHTS; i++){
 		result += CalcPointLight(lights[i], norm, FragPos, viewDir);
 	}
@@ -59,7 +59,7 @@ vec3 CalcPointLight( Light light, vec3 normal, vec3 fragPos, vec3 viewDir){
     diffuse  *= attenuation;
     specular *= attenuation;
     
-	vec3 result;
+	vec3 result = vec3(0.0,0.0,0.0);
     result = vec3(ambient + diffuse + specular);
 	return result;
 }

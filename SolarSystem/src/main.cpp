@@ -227,7 +227,7 @@ int main()
 
         //over the sun
         if (cameraType == "Up") {
-            camera.SetPosition(glm::vec3(-1.5f, 55.0f, -3.0f));
+            camera.SetPosition(glm::vec3(-3.0f, 85.0f, -5.0f));
             camera.SetOrientation(0.0f, -88.0f);
         }    
 
