@@ -13,3 +13,8 @@ SolarSystem/x64/*
 SolarSystem/bin/Debug/*
 *.pdb
 *.vsidx
+.vscode/*
+*.cmake
+SolarSystem/build/CMakeFiles/*
+CMakeCache.txt
+Makefile
