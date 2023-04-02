@@ -86,7 +86,6 @@ int main()
 
     // Load models    
     Model earthModel("../resources/models/earth/Earth.obj");
-    Model space("../resources/models/space/space.obj");
     Model sunModel1("../resources/models/sun/sun.obj");
     Model sunModel2("../resources/models/sun2/sun.obj");
     Model mercuryModel("../resources/models/mercury/mercury.obj");
@@ -184,15 +183,15 @@ int main()
         }
 
         // Mars
-        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.7f, 300.0f, 0.3f, 40.0f);
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.7f, 310.0f, 0.3f, 40.0f);
         marsModel.Draw(modelShader);
 
         // Jupiter
-        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.6f, 350.0f, 4.0f, 30.0f);
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.6f, 360.0f, 4.0f, 30.0f);
         jupiterModel.Draw(modelShader);
 
         // Saturn  
-        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.5f, 410.0f, 0.032f, 20.0f, glm::vec3(0.0f, 0.5f, -0.35f));
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.5f, 430.0f, 0.032f, 20.0f, glm::vec3(0.0f, 0.5f, -0.35f));
         model = get<0>(modelAndCoordinates);
         model = glm::rotate(model, 61.0f, glm::vec3(0.0f, 0.1f, 0.0f));
         model = glm::rotate(model, 90.0f, glm::vec3(0.1f, 0.0f, 0.0f));
@@ -200,11 +199,11 @@ int main()
         saturnModel.Draw(modelShader);
 
         // Uranus
-        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.4f, 450.0f, 0.03f, 10.0f);
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.4f, 480.0f, 0.03f, 10.0f);
         uranusModel.Draw(modelShader);
 
         // Neptune
-        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.3f, 500.0f, 0.03f, 10.0f);
+        modelAndCoordinates = planetHelper.transformPlanetModel(modelShader, i, 0.3f, 530.0f, 0.03f, 10.0f);
         neptuneModel.Draw(modelShader);
 
         //Orbit Lines

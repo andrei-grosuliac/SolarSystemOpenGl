@@ -5,5 +5,11 @@ SolarSystem/x64/*
 *.htm
 *.vcxproj
 *.filters
-*.dll
 *.user
+*.lock
+*.suo
+*.db
+*.recipe
+SolarSystem/bin/Debug/*
+*.pdb
+*.vsidx
