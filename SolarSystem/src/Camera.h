@@ -103,6 +103,7 @@ public:
 
     void DecreaseSpeed() {
         this->movementSpeed = this->movementSpeed - 0.1f;
+        if(this->movementSpeed < 0.1f) this->movementSpeed = 0.1f;
     }
 
     void IncreaseSpeed() {

@@ -10,7 +10,6 @@ find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
-#find_library(soil2 REQUIRED)
 
 include_directories(
     ${GLEW_INCLUDE_DIRS}
@@ -31,5 +30,4 @@ target_link_libraries(
     ${ASSIMP_LIBRARIES}
     soil2
     OpenGL::GL
-    stdc++fs
 )
