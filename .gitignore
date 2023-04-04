@@ -1,4 +1,3 @@
-Dependencies/*
 .vs/*
 x64/*
 SolarSystem/x64/*
@@ -18,3 +17,9 @@ SolarSystem/bin/Debug/*
 SolarSystem/build/CMakeFiles/*
 CMakeCache.txt
 Makefile
+*.log
+*.tlog
+*.iobj
+*.ipdb
+*.obj
+*.iss
