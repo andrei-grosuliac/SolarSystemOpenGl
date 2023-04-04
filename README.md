@@ -29,7 +29,7 @@ Running Instructions
 
 Windows
 
-Option #1 Open .sln file with Visual Studio 2022 and run (might need to update lib and include directories in solution properties)
+Option #1 Open .sln file with Visual Studio 2022 and run (might need to update lib and include directories in solution properties)  
 Option #2 Download the whole project and run the .exe in 'bin' fodler
 
 Linux
