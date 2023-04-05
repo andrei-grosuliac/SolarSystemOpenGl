@@ -1,0 +1,309 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 15">
+<meta name=Originator content="Microsoft Word 15">
+<link rel=File-List href="SolarSystemWebPage_files/filelist.xml">
+<link rel=Edit-Time-Data href="SolarSystemWebPage_files/editdata.mso">
+<link rel=themeData href="SolarSystemWebPage_files/themedata.thmx">
+<link rel=colorSchemeMapping href="SolarSystemWebPage_files/colorschememapping.xml">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+<style>
+figcaption {
+    text-align: center;
+	margin-top: 10;
+}
+
+.WordSection1 {
+	background-color: #FFF;
+    margin: 0 auto 0 auto;
+	padding-top: 75px;
+    display: block;
+    position: relative;
+    width: 1000px;
+}
+
+body {
+	background-image: url(./space.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  box-sizing: border-box;
+}
+
+.github-link {
+      align-items: center;
+      text-decoration: none;
+      font-size: 18px;
+      color: #333;
+    }
+
+.github-link:hover {
+  color: #0366d6;
+}
+
+.github-icon {
+  margin-right: 5px;
+}
+
+</style>
+</head>
+
+<body lang=EN-CA style='tab-interval:.5in;word-wrap:break-word'>
+
+<div class=WordSection1>
+
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:20.0pt;line-height:107%'>Solar System in OpenGL<o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:12.0pt;line-height:107%'>By Andrei Grosuliac</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'>April 5, 2023</p>
+
+<p class=MsoNormal align=center style='text-align:center'>
+	<!-- GitHub link with icon -->
+  <a class="github-link" href="https://github.com/andrei-grosuliac/SolarSystemOpenGl" target="_blank">
+	<i class="fab fa-github github-icon"></i>
+	GitHub
+  </a>
+</p>
+
+<p class=MsoNormal align=center style='text-align:center'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><b><span
+style='font-size:16.0pt;line-height:150%'>Project Description<o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>What
+if our solar system was <b>binary</b>, meaning there was two suns?<b><span
+style='font-size:16.0pt;line-height:150%'><o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>How
+would planets orbit around them and still be habitable?</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>This
+OpenGL project aims to create such an immersive experience to help users
+visualize such a system.</p>
+
+<p class=MsoNormal align=center style='text-align:center;text-indent:.5in;
+line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>Libraries<o:p></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><i>GLFW,
+GLEW</i>, <i>GLM</i></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><i>ASSIMP,
+SOIL2</i></p>
+
+<p class=MsoNormal style='line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><b><span
+style='font-size:16.0pt;line-height:150%'>Objectives<o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>1.
+Create 3D models of the planets and stars<o:p></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- 3D
+Models found from the Internet for planet and Stars.</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- Loaded
+with ASSIMP and Model/Mesh classes.</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>2.
+Use textures and astronomical data to enhance visual fidelity<o:p></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- 2D
+Textures found from the Internet for plant and Stars and skybox</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- Loaded
+with SOIL2 and mipmaps generated<o:p></o:p></p>
+
+<p class=MsoNormal style='line-height:150%'> <span style='mso-ignore:vglayout'>
+<p class=MsoNormal style='line-height:150%'><span style='mso-tab-count:14'>                    </span></p>
+
+<div align=center>
+ <div class="row">
+  <div class="col"><img 191 height=168
+  src="SolarSystemWebPage_files/image005.png">
+  <figcaption>Mercury</figcaption>
+  </div>
+  <div class="col"><img 180 height=167
+  src="SolarSystemWebPage_files/image006.png">
+  <figcaption>Venus</figcaption>
+  </div>
+  <div class="col"><img 175 height=165
+  src="SolarSystemWebPage_files/image007.png">
+  <figcaption>Earth</figcaption>
+  </div>
+  <div class="col"><img 179 height=165
+  src="SolarSystemWebPage_files/image008.png"
+  >
+  <figcaption>Mars</figcaption>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col"><img 186 height=186
+  src="SolarSystemWebPage_files/image013.png" >
+  <figcaption>Jupiter</figcaption>
+  </div>
+  <div class="col"><img 186 height=181
+  src="SolarSystemWebPage_files/image014.png">
+  <figcaption>Saturn</figcaption>
+  </div>
+  <div class="col"><img 247 height=182
+  src="SolarSystemWebPage_files/image015.png"
+  >
+  <figcaption>Uranus</figcaption>
+  </div>
+  <div class="col"><img 202 height=180
+  src="SolarSystemWebPage_files/image016.png"
+  >
+  <figcaption>Neptune</figcaption>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col"><img 283 height=283
+  src="SolarSystemWebPage_files/image020.png">
+  <figcaption>Sun #1</figcaption>
+  </div>
+  <div class="col"><img 283 height=283
+  src="SolarSystemWebPage_files/image019.png">
+  <figcaption>Sun #2</figcaption>
+  </div>
+ </div>
+ </div>
+
+<br style='mso-ignore:vglayout' clear=ALL>
+
+<p class=MsoNormal style='line-height:150%'><span style='mso-tab-count:14'>                    </span></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>3.
+Implement accurate movement of the planets<o:p></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- 2
+suns orbiting in a circle around their center of mass</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>- Planets
+orbiting in an ellipse around the suns’ center of mass</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><span
+style='mso-no-proof:yes'> <img width=482 height=417
+src="SolarSystemWebPage_files/image022.png" v:shapes="Picture_x0020_11">
+<figcaption>Orbital Path of Planets Around Suns</figcaption>
+</span></p>
+
+<p class=MsoNormal style='text-indent:.5in;line-height:150%'><o:p>&nbsp;</o:p></p>
+<p class=MsoNormal style='text-indent:.5in;line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>4.
+Implement a realistic lighting model for a binary star system<o:p></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>-
+Local illumination with 2 rotating point lights: 1 white, 1 red</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>-
+Use of ambient, diffuse and specular components on planets’ textures</p>
+
+<p class=MsoNormal style='line-height:150%'><u><o:p><span style='text-decoration:
+ none'>&nbsp;</span></o:p></u></p>
+
+<p class=MsoNormal style='line-height:150%'><u><o:p><span style='text-decoration:
+ none'>&nbsp;</span></o:p></u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><u>5.
+Create an interactive, orbital camera system</u></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>W:
+zoom in<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>S:
+zoom out<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>D/Right:
+move right<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>A/Left:
+move left<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>Up:
+move up<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>Down:
+move down<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>P:
+pause movement<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>O:
+show/hide orbital lines<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>1: view
+from above<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>2:
+unlocks camera<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>3: view
+from earth<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>M: increase
+orbital speed<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>N:
+decrease orbital speed<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>=:
+increase camera speed<o:p></o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'>-:
+decrease camera speed</p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><b><span
+style='font-size:16.0pt;line-height:150%'>Video Demo</span><o:p></o:p></b></p>
+
+<p class=MsoNormal align=center style='text-align:center;line-height:150%'><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal style='text-indent:.5in;line-height:150%'>
+<div align="center">
+<a
+href="https://www.youtube.com/embed/cIzKk5fyI8I?feature=oembed"><img border=0
+width=484 height=461 src="SolarSystemWebPage_files/image024.png"
+alt="Binary Solar System OpenGL" title="" v:shapes="Video_x0020_12"></a>
+</div>
+<span style='mso-spacerun:yes'> </span></p>
+
+<p class=MsoNormal style='text-indent:.5in;line-height:150%'><o:p>&nbsp;</o:p></p>
+
+</div>
+
+</body>
+
+</html>
+</body>
+</html>
